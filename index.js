@@ -19,7 +19,7 @@ function WaterRower( opts ) {
   this.serialPort = new serialport.SerialPort( this.comPort, {
     baudrate: this.baudRate,
     disconnectedCallback: function () { this.emit('disconnect'); }.bind(this),
-    parser: com.parsers.readline("\n")
+    parser: serialport.parsers.readline("\n")
   });
 
   this.serialPort.on("error", function( err ) {
