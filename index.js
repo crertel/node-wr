@@ -1,0 +1,60 @@
+var serialport = require('serialport');
+var util = require('util');
+var EventEmitter = require('events');
+
+var debug = function() {};
+
+function WaterRower( opts ) {
+  var opts = opts || {};
+  EventEmitter.call(this);
+  this.comPort = opts.port || "";
+  this.baudRate = opts.baudRate || 115200;
+  this.pollRate = opts.pollRate || 800;
+
+  debug("Creating new water rower");
+  debug("\tlistening on port " + this.comPort);
+  debug('\tlistening at rate ' + this.rate);
+  debug('\tpolling at rate ' + this.pollRate);
+
+  this.serialPort = new serialPort.SerialPort( this.comPort, {
+    baudrate: this.baudRate,
+    disconnectedCallback: function () { this.emit('disconnect'); }.bind(this),
+    parser: com.parsers.readline("\n")
+  });
+
+  this.serialPort.on("error", function( err ) {
+    debug('port ' + this.comPort + ' error ' + err);
+    this.emit('error', err);
+  }.bind(this));
+  this.serialPort.on("open", function () {
+    debug('port ' + this.comPort + ' open');
+    this.emit('connect');
+  }.bind(this));
+  this.serialPort.on("closed", function () {
+    debug('port ' + this.comPort + ' closed');
+    this.emit('disconnect');
+  }.bind(this));
+  this.serialPort.on("data", function(data) {
+    var trimmedData = data.trim();
+    debug('port ' + this.port + ' read ' + trimmedData );
+    dispatchWRMessage( trimmedData );
+  }.bind(this));
+
+  //function e() { this.emit('row', {row:1}); setTimeout(e.bind(this), 1000); };
+}
+util.inherits(WaterRower, EventEmitter);
+
+WaterRower.prototype.dispatchWRMessage = function( msg ) {
+  debug('port ' + this.port + ' dispatch ' + trimmedData );
+};
+
+module.exports = function( opts ){
+  var opts = opts || {};
+
+  if (opts.debug) {
+    debug = console.log;
+  }
+  return {
+    WaterRower: WaterRower
+  };
+}

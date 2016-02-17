@@ -1,0 +1,27 @@
+{
+  "name": "node-wr",
+  "version": "0.0.1",
+  "description": "Alternate Water-rower support for Node.",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test:all"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crertel/node-wr.git"
+  },
+  "keywords": [
+    "water-rower",
+    "exercise"
+  ],
+  "author": "Chris Ertel",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/crertel/node-wr/issues"
+  },
+  "homepage": "https://github.com/crertel/node-wr#readme",
+  "dependencies": {
+    "bluebird": "^3.3.1",
+    "serialport": "^2.0.6"
+  }
+}
