@@ -4,9 +4,17 @@ var EventEmitter = require('events');
 
 var debug = function() {};
 
+var kStates = {
+  disconnected: 'disconnected',
+  connected: 'connected',
+
+};
+
 function WaterRower( opts ) {
   var opts = opts || {};
   EventEmitter.call(this);
+
+  this.state = kStates.disconnected;
   this.comPort = opts.port || "";
   this.baudRate = opts.baudRate || 115200;
   this.pollRate = opts.pollRate || 800;
@@ -25,9 +33,12 @@ function WaterRower( opts ) {
   this.serialPort.on("error", function( err ) {
     debug('port ' + this.comPort + ' error ' + err);
     this.emit('error', err);
+    this.state = kStates.disconnected;
   }.bind(this));
   this.serialPort.on("open", function () {
     debug('port ' + this.comPort + ' open');
+
+    // tell the waterrower that we're wanting to talk to it.
     this.serialPort.write('USB\r\n', function(err, res){
       if (err) {
         this.emit('error', err);
@@ -39,19 +50,24 @@ function WaterRower( opts ) {
   this.serialPort.on("closed", function () {
     debug('port ' + this.comPort + ' closed');
     this.emit('disconnect');
+    this.state = kStates.disconnected;
   }.bind(this));
   this.serialPort.on("data", function(data) {
     var trimmedData = data.trim();
-    debug('port ' + this.port + ' read ' + trimmedData );
-    this.dispatchRWMessage( data );
+    debug('port ' + this.comPort + ' read ' + trimmedData );
+    this.ingestRWMessage( data );
   }.bind(this));
-
-  //function e() { this.emit('row', {row:1}); setTimeout(e.bind(this), 1000); };
 }
 util.inherits(WaterRower, EventEmitter);
 
-WaterRower.prototype.dispatchRWMessage = function( msg ) {
-  debug('port ' + this.port + ' dispatch ' + msg );
+WaterRower.prototype.ingestRWMessage = function( msg ) {
+  debug('port ' + this.comPort + ' dispatch ' + msg );
+  if (this.state === kStates.disconnected) {
+    if (msg === '_WR_\r\n') {
+      this.state = kStates.connected;
+    }
+  } else if (this.state === kStates.connected) {
+  }
 };
 
 module.exports = function( opts ){
