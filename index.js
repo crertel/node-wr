@@ -7,8 +7,23 @@ var debug = function() {};
 var kStates = {
   disconnected: 'disconnected',
   connected: 'connected',
-
+  expectStrokeCount: 'expectStrokeCount',
+  expectTotalSpeed: 'expectTotalSpeed',
+  expectAverageSpeed: 'expectAverageSpeed',
+  expectDistance: 'expectDistance',
+  expectHeartRate: 'expectHeartRate'
 };
+
+
+/*
+"_WR_":{"response":"CONNECTED","next":"IRD140"},
+"IDD140":{"response":"STROKE_COUNT","next":"IRD148"},
+"IDD148":{"response":"TOTAL_SPEED","next":"IRD14A"},
+"IDD14A":{"response":"AVERAGE_SPEED","next":"IRD057"},
+"IDD057":{"response":"DISTANCE","next":"IRS1A0"},
+"IDS1A0":{"response":"HEARTRATE","next":"IRD140"},
+"AKR":{"response":"RESET","next":"IRD140"}
+*/
 
 function WaterRower( opts ) {
   var opts = opts || {};
@@ -18,6 +33,15 @@ function WaterRower( opts ) {
   this.comPort = opts.port || "";
   this.baudRate = opts.baudRate || 115200;
   this.pollRate = opts.pollRate || 800;
+  this.lastPing = null;
+
+  this.readings = {
+    strokeCount: 0,
+    totalSpeed: 0,
+    averageSpeed: 0,
+    distance: 0,
+    heartRate: 0
+  };
 
   debug("Creating new water rower");
   debug("\tlistening on port " + this.comPort);
@@ -62,11 +86,23 @@ util.inherits(WaterRower, EventEmitter);
 
 WaterRower.prototype.ingestRWMessage = function( msg ) {
   debug('port ' + this.comPort + ' dispatch ' + msg );
-  if (this.state === kStates.disconnected) {
-    if (msg === '_WR_\r\n') {
-      this.state = kStates.connected;
+
+  if (msg === 'PING\r\n') {
+    // pings are always going to get handled
+    this.lastPing = Date.now();
+  } else if (msg ==='ERROR\r\n') {
+    // errors are always going to get handled
+    this.emit('error', 'error from water rower');
+    this.lastPing = Date.now();
+  } else {
+    if (this.state === kStates.disconnected) {
+      if (msg === '_WR_\r\n') {
+        this.state = kStates.connected;
+        this.lastPing = Date.now();
+      }
+    } else if (this.state === kStates.connected) {
+
     }
-  } else if (this.state === kStates.connected) {
   }
 };
 
