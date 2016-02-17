@@ -43,7 +43,7 @@ function WaterRower( opts ) {
   this.serialPort.on("data", function(data) {
     var trimmedData = data.trim();
     debug('port ' + this.port + ' read ' + trimmedData );
-    dispatchRWMessage( data );
+    this.dispatchRWMessage( data );
   }.bind(this));
 
   //function e() { this.emit('row', {row:1}); setTimeout(e.bind(this), 1000); };
