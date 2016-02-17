@@ -16,7 +16,7 @@ function WaterRower( opts ) {
   debug('\tlistening at rate ' + this.rate);
   debug('\tpolling at rate ' + this.pollRate);
 
-  this.serialPort = new serialPort.SerialPort( this.comPort, {
+  this.serialPort = new serialport.SerialPort( this.comPort, {
     baudrate: this.baudRate,
     disconnectedCallback: function () { this.emit('disconnect'); }.bind(this),
     parser: com.parsers.readline("\n")
