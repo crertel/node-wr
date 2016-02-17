@@ -28,7 +28,13 @@ function WaterRower( opts ) {
   }.bind(this));
   this.serialPort.on("open", function () {
     debug('port ' + this.comPort + ' open');
-    this.emit('connect');
+    this.serialPort.write('USB\r\n', function(err, res){
+      if (err) {
+        this.emit('error', err);
+      } else {
+        this.emit('connect');
+      }
+    }.bind(this));
   }.bind(this));
   this.serialPort.on("closed", function () {
     debug('port ' + this.comPort + ' closed');
@@ -37,14 +43,14 @@ function WaterRower( opts ) {
   this.serialPort.on("data", function(data) {
     var trimmedData = data.trim();
     debug('port ' + this.port + ' read ' + trimmedData );
-    dispatchWRMessage( trimmedData );
+    dispatchRWMessage( data );
   }.bind(this));
 
   //function e() { this.emit('row', {row:1}); setTimeout(e.bind(this), 1000); };
 }
 util.inherits(WaterRower, EventEmitter);
 
-WaterRower.prototype.dispatchWRMessage = function( msg ) {
+WaterRower.prototype.dispatchRWMessage = function( msg ) {
   debug('port ' + this.port + ' dispatch ' + trimmedData );
 };
 
