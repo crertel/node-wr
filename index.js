@@ -51,7 +51,7 @@ function WaterRower( opts ) {
 util.inherits(WaterRower, EventEmitter);
 
 WaterRower.prototype.dispatchRWMessage = function( msg ) {
-  debug('port ' + this.port + ' dispatch ' + trimmedData );
+  debug('port ' + this.port + ' dispatch ' + msg );
 };
 
 module.exports = function( opts ){
