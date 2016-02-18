@@ -16,12 +16,12 @@
       var ws = new WebSocket("ws://" + location.host);
       ws.onmessage = function(msg) {
         var readings = JSON.parse(msg.data);
-        $state.innerHTML = "";
+        $stats.innerHTML = "";
         Object.keys(readings).forEach(function (k) {
           var reading = readings[k];
           var $reading = document.createElement('li');
           $reading.innerHTML = "<strong>" + k + "</strong> " + reading;
-          $state.appendChild($reading);
+          $stats.appendChild($reading);
         });
       }
     </script>
