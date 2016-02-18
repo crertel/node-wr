@@ -37,14 +37,7 @@ function WaterRower( opts ) {
     debug('port ' + this.comPort + ' open');
 
     // tell the waterrower that we're wanting to talk to it.
-    this.serialPort.write('USB\r\n', function(err, res){
-      if (err) {
-        this.emit('error', err);
-      } else {
-        this.emit('connect');
-        this.serialPort.emit('data', "let's start this party");
-      }
-    }.bind(this));
+    this.serialPort.write('USB\r\n');
   }.bind(this));
 
   this.serialPort.on("data", function(data) {
@@ -97,7 +90,13 @@ WaterRower.prototype.ingestMessage = function( msg ) {
 
 WaterRower.prototype.stateDisconnected = function ( msg ) {
   debug('in state disconnected');
-  return (msg==='_WR_\r\n') ? this.stateConnected : this.stateDisconnected;
+  if (msg==='_WR_\r\n') {
+    this.emit('connect');
+    this.serialPort.emit('data', "let's start this party");
+    return this.stateConnected;
+  } else {
+    return this.stateDisconnected
+  }
 }
 
 WaterRower.prototype.stateConnected = function ( msg ) {
