@@ -77,13 +77,14 @@ WaterRower.prototype.ingestMessage = function( msg ) {
   this.lastPing = Date.now();
 
   switch(true) {
-    case msgPing.test(msg):           break;
+
     case msgError.test(msg):          this.emit('error', 'error from water rower');
                                       break;
     case msgStrokeStart.test(msg):    this.emit('stroke start');
                                       break;
     case msgStrokeEnd.test(msg):      this.emit('stroke end');
                                       break;
+    case msgPing.test(msg):           // fallthrough
     default:                          this.stateHandler = this.stateHandler( msg );
                                       break;
   }
