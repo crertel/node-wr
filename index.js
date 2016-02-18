@@ -25,7 +25,7 @@ app.get('/', function(req, res) {
 });
 
 wsServer.on('connection', function connection(sock) {
-  var location = url.parse(ws.upgradeReq.url, true);
+  var location = url.parse(sock.upgradeReq.url, true);
   var updateListener = function(msg) {
     sock.send( JSON.stringify(msg) );
   };
