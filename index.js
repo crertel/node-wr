@@ -20,7 +20,7 @@ var rower = new wr.WaterRower({ port: comport });
 
 var express = require('express');
 var app = express();
-app.get('/', express.static(__dirname+'/public');
+app.get('/', express.static(__dirname+'/public') );
 
 wsServer.on('connection', function connection(sock) {
   var location = url.parse(sock.upgradeReq.url, true);
