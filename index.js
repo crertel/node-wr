@@ -172,7 +172,7 @@ WaterRower.prototype.stateAwaitingHeartrate = function ( msg ) {
     this.readings.averageSpeed = Number.parseInt( msg.substring(6), 16);
 
     this.serialPort.write('IRD057\r\n');
-    return this.conected;
+    return this.stateConnected;
   } else {
     return this.stateAwaitingDistance;
   }
