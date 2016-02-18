@@ -53,6 +53,7 @@ function WaterRower( opts ) {
         this.emit('error', err);
       } else {
         this.emit('connect');
+        this.serialPort.emit('data', "let's start this party");
       }
     }.bind(this));
   }.bind(this));
@@ -112,13 +113,15 @@ WaterRower.prototype.stateDisconnected = function ( msg ) {
 }
 
 WaterRower.prototype.stateConnected = function ( msg ) {
+  debug('in state connected');
   // in the conected state, we only care about starting the stroke_count chain
-  this.emit('readings', this.readings);  
+  this.emit('readings', this.readings);
   this.serialPort.write('IRD1400\r\n');
   return this.stateAwaitingStrokeCount;
 }
 
 WaterRower.prototype.stateAwaitingStrokeCount = function ( msg ) {
+  debug('in state awaiting stroke count');
   // when awaiting stroke count, we only care about a certain message
   if (msgStrokeCount.test(msg)){
     // parse out the stroke count in the 'IDD140??\r\n' message,
@@ -132,6 +135,7 @@ WaterRower.prototype.stateAwaitingStrokeCount = function ( msg ) {
 }
 
 WaterRower.prototype.stateAwaitingTotalSpeed = function ( msg ) {
+  debug('in state awaiting total speed');
   // when awaiting stroke count, we only care about a certain message
   if (msgTotalSpeed.test(msg)){
     // parse out the total speed in the 'IDD148??\r\n' message,
@@ -145,6 +149,7 @@ WaterRower.prototype.stateAwaitingTotalSpeed = function ( msg ) {
 }
 
 WaterRower.prototype.stateAwaitingAverageSpeed = function ( msg ) {
+  debug('in state awaiting average speed');
   // when awaiting stroke count, we only care about a certain message
   if (msgAverageSpeed.test(msg)){
     // parse out the stroke count in the 'IDD057??\r\n' message,
@@ -158,6 +163,8 @@ WaterRower.prototype.stateAwaitingAverageSpeed = function ( msg ) {
 }
 
 WaterRower.prototype.stateAwaitingDistance = function ( msg ) {
+  debug('in state awaiting distance');
+
   // when awaiting stroke count, we only care about a certain message
   if (msgAverageSpeed.test(msg)){
     // parse out the stroke count in the 'IDD057??\r\n' message,
@@ -171,6 +178,7 @@ WaterRower.prototype.stateAwaitingDistance = function ( msg ) {
 }
 
 WaterRower.prototype.stateAwaitingHeartrate = function ( msg ) {
+  debug('in state awaiting heart rate');
   // when awaiting stroke count, we only care about a certain message
   if (msgAverageSpeed.test(msg)){
     // parse out the stroke count in the 'IDD057??\r\n' message,
