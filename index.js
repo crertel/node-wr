@@ -20,9 +20,7 @@ var rower = new wr.WaterRower({ port: comport });
 
 var express = require('express');
 var app = express();
-app.get('/', function(req, res) {
-  res.status(200).send('Hello, world!');
-});
+app.get('/', express.static(__dirname+'/public');
 
 wsServer.on('connection', function connection(sock) {
   var location = url.parse(sock.upgradeReq.url, true);
@@ -39,7 +37,6 @@ wsServer.on('connection', function connection(sock) {
 
   console.log("Socket connect.");
 });
-
 
 console.log('Starting water rower.');
 server.on('request', app);
