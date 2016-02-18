@@ -14,17 +14,6 @@ var kStates = {
   expectHeartRate: 'expectHeartRate'
 };
 
-
-/*
-"_WR_":{"response":"CONNECTED","next":"IRD140"},
-"IDD140":{"response":"STROKE_COUNT","next":"IRD148"},
-"IDD148":{"response":"TOTAL_SPEED","next":"IRD14A"},
-"IDD14A":{"response":"AVERAGE_SPEED","next":"IRD057"},
-"IDD057":{"response":"DISTANCE","next":"IRS1A0"},
-"IDS1A0":{"response":"HEARTRATE","next":"IRD140"},
-"AKR":{"response":"RESET","next":"IRD140"}
-*/
-
 function WaterRower( opts ) {
   var opts = opts || {};
   EventEmitter.call(this);
@@ -34,6 +23,7 @@ function WaterRower( opts ) {
   this.baudRate = opts.baudRate || 115200;
   this.pollRate = opts.pollRate || 800;
   this.lastPing = null;
+  this.stateHandler = this.stateDisconnected;
 
   this.readings = {
     strokeCount: 0,
@@ -54,11 +44,6 @@ function WaterRower( opts ) {
     parser: serialport.parsers.readline("\n")
   });
 
-  this.serialPort.on("error", function( err ) {
-    debug('port ' + this.comPort + ' error ' + err);
-    this.emit('error', err);
-    this.state = kStates.disconnected;
-  }.bind(this));
   this.serialPort.on("open", function () {
     debug('port ' + this.comPort + ' open');
 
@@ -71,40 +56,132 @@ function WaterRower( opts ) {
       }
     }.bind(this));
   }.bind(this));
+
+  this.serialPort.on("data", function(data) {
+    var trimmedData = data.trim();
+    debug('port ' + this.comPort + ' read ' + trimmedData );
+    this.ingestMessage( data );
+  }.bind(this));
+
   this.serialPort.on("closed", function () {
     debug('port ' + this.comPort + ' closed');
     this.emit('disconnect');
     this.state = kStates.disconnected;
   }.bind(this));
-  this.serialPort.on("data", function(data) {
-    var trimmedData = data.trim();
-    debug('port ' + this.comPort + ' read ' + trimmedData );
-    this.ingestRWMessage( data );
+
+  this.serialPort.on("error", function( err ) {
+    debug('port ' + this.comPort + ' error ' + err);
+    this.emit('error', err);
+    this.state = kStates.disconnected;
   }.bind(this));
 }
 util.inherits(WaterRower, EventEmitter);
 
-WaterRower.prototype.ingestRWMessage = function( msg ) {
+var msgPing = /^PING\r\n$/;
+var msgError = /^ERROR\r\n$/;
+var msgStrokeStart = /^SS\r\n$/;
+var msgStrokeEnd = /^SE\r\n$/;
+var msgStrokePulse = /^P(\d|[A-Fa-f]){2}\r\n$/;
+var msgStrokeCount = /^IDD140(\d|[A-Fa-f]){2}\r\n$/;
+var msgTotalSpeed = /^IDD148(\d|[A-Fa-f]){2}\r\n$/;
+var msgAverageSpeed = /^IDD14A(\d|[A-Fa-f]){2}\r\n$/;
+var msgDistance = /^IDD057(\d|[A-Fa-f]){2}\r\n$/;
+var msgHeartrate = /^IDD1A0(\d|[A-Fa-f]){2}\r\n$/;
+
+WaterRower.prototype.ingestMessage = function( msg ) {
   debug('port ' + this.comPort + ' dispatch ' + msg );
 
-  if (msg === 'PING\r\n') {
-    // pings are always going to get handled
-    this.lastPing = Date.now();
-  } else if (msg ==='ERROR\r\n') {
-    // errors are always going to get handled
-    this.emit('error', 'error from water rower');
-    this.lastPing = Date.now();
-  } else {
-    if (this.state === kStates.disconnected) {
-      if (msg === '_WR_\r\n') {
-        this.state = kStates.connected;
-        this.lastPing = Date.now();
-      }
-    } else if (this.state === kStates.connected) {
+  // we consider *any* message, not just PING, as a confirmation of the controllers existence
+  this.lastPing = Date.now();
 
-    }
+  switch(true) {
+    case msgPing.test(msg):           break;
+    case msgError.test(msg):          this.emit('error', 'error from water rower');
+                                      break;
+    case msgStrokeStart.test(msg):    this.emit('stroke start');
+                                      break;
+    case msgStrokeEnd.test(msg):      this.emit('stroke end');
+                                      break;
+    default:                          this.stateHandler = this.stateHandler( msg );
+                                      break;
   }
 };
+
+WaterRower.prototype.stateDisconnected = function ( msg ) {
+  return (msg==='_WR_\r\n') ? this.stateConnected : this.stateDisconnected;
+}
+
+WaterRower.prototype.stateConnected = function ( msg ) {
+  // in the conected state, we only care about starting the stroke_count chain
+  this.emit('readings', this.readings);  
+  this.serialPort.write('IRD1400\r\n');
+  return this.stateAwaitingStrokeCount;
+}
+
+WaterRower.prototype.stateAwaitingStrokeCount = function ( msg ) {
+  // when awaiting stroke count, we only care about a certain message
+  if (msgStrokeCount.test(msg)){
+    // parse out the stroke count in the 'IDD140??\r\n' message,
+    this.readings.strokeCount = Number.parseInt( msg.substring(6), 16);
+
+    this.serialPort.write('IRD148\r\n');
+    return this.stateAwaitingTotalSpeed;
+  } else {
+    return this.stateAwaitingStrokeCount;
+  }
+}
+
+WaterRower.prototype.stateAwaitingTotalSpeed = function ( msg ) {
+  // when awaiting stroke count, we only care about a certain message
+  if (msgTotalSpeed.test(msg)){
+    // parse out the total speed in the 'IDD148??\r\n' message,
+    this.readings.totalSpeed = Number.parseInt( msg.substring(6), 16);
+
+    this.serialPort.write('IRD14A\r\n');
+    return this.stateAwaitingAverageSpeed;
+  } else {
+    return this.stateAwaitingTotalSpeed;
+  }
+}
+
+WaterRower.prototype.stateAwaitingAverageSpeed = function ( msg ) {
+  // when awaiting stroke count, we only care about a certain message
+  if (msgAverageSpeed.test(msg)){
+    // parse out the stroke count in the 'IDD057??\r\n' message,
+    this.readings.averageSpeed = Number.parseInt( msg.substring(6), 16);
+
+    this.serialPort.write('IRD057\r\n');
+    return this.stateAwaitingDistance;
+  } else {
+    return this.stateAwaitingAverageSpeed;
+  }
+}
+
+WaterRower.prototype.stateAwaitingDistance = function ( msg ) {
+  // when awaiting stroke count, we only care about a certain message
+  if (msgAverageSpeed.test(msg)){
+    // parse out the stroke count in the 'IDD057??\r\n' message,
+    this.readings.averageSpeed = Number.parseInt( msg.substring(6), 16);
+
+    this.serialPort.write('IRD1A0\r\n');
+    return this.stateAwaitingHeartrate;
+  } else {
+    return this.stateAwaitingDistance;
+  }
+}
+
+WaterRower.prototype.stateAwaitingHeartrate = function ( msg ) {
+  // when awaiting stroke count, we only care about a certain message
+  if (msgAverageSpeed.test(msg)){
+    // parse out the stroke count in the 'IDD057??\r\n' message,
+    this.readings.averageSpeed = Number.parseInt( msg.substring(6), 16);
+
+    this.serialPort.write('IRD057\r\n');
+    return this.conected;
+  } else {
+    return this.stateAwaitingDistance;
+  }
+}
 
 module.exports = function( opts ){
   var opts = opts || {};
