@@ -4,21 +4,10 @@ var EventEmitter = require('events');
 
 var debug = function() {};
 
-var kStates = {
-  disconnected: 'disconnected',
-  connected: 'connected',
-  expectStrokeCount: 'expectStrokeCount',
-  expectTotalSpeed: 'expectTotalSpeed',
-  expectAverageSpeed: 'expectAverageSpeed',
-  expectDistance: 'expectDistance',
-  expectHeartRate: 'expectHeartRate'
-};
-
 function WaterRower( opts ) {
   var opts = opts || {};
   EventEmitter.call(this);
 
-  this.state = kStates.disconnected;
   this.comPort = opts.port || "";
   this.baudRate = opts.baudRate || 115200;
   this.pollRate = opts.pollRate || 800;
@@ -67,13 +56,11 @@ function WaterRower( opts ) {
   this.serialPort.on("closed", function () {
     debug('port ' + this.comPort + ' closed');
     this.emit('disconnect');
-    this.state = kStates.disconnected;
   }.bind(this));
 
   this.serialPort.on("error", function( err ) {
     debug('port ' + this.comPort + ' error ' + err);
     this.emit('error', err);
-    this.state = kStates.disconnected;
   }.bind(this));
 }
 util.inherits(WaterRower, EventEmitter);
@@ -109,6 +96,7 @@ WaterRower.prototype.ingestMessage = function( msg ) {
 };
 
 WaterRower.prototype.stateDisconnected = function ( msg ) {
+  debug('in state disconnected');
   return (msg==='_WR_\r\n') ? this.stateConnected : this.stateDisconnected;
 }
 
