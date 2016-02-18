@@ -4,7 +4,7 @@ var ws = require('ws');
 var parseArgs = require('minimist');
 var argv = parseArgs( process.argv , {
   number: [ 'port' ],
-  string: [ 'compart' ],
+  string: [ 'comport' ],
   boolean: [ 'debug']
 });
 
