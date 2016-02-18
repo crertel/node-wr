@@ -26,13 +26,13 @@ app.get('/', function(req, res) {
 
 wsServer.on('connection', function connection(sock) {
   var location = url.parse(ws.upgradeReq.url, true);
-  var updateListener = function(msg)
+  var updateListener = function(msg) {
     sock.send( JSON.stringify(msg) );
   };
 
   rower.on('readings', updateListener);
 
-  sock.on('disconnect', function(){
+  sock.on('disconnect', function() {
     rower.removeListener(updateListener);
     console.log("Socket disconnect.");
   });
