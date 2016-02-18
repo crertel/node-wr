@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Water Rower</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <h1> Water Rower </h1>
+    <div>
+      <ul id="stats">
+      </ul>
+    </div>
+
+    <script>
+      var $stats = document.getElementById("stats");
+      var ws = new WebSocket("ws://" + location.host);
+      ws.onmessage = function(msg) {
+        var readings = JSON.parse(msg.data);
+        $state.innerHTML = "";
+        Object.keys(readings).forEach(function (k) {
+          var reading = readings[k];
+          var $reading = document.createElement('li');
+          $reading.innerHTML = "<strong>" + k + "</strong> " + reading;
+          $state.appendChild($reading);
+        });
+      }
+    </script>
+  </body>
+</html>
