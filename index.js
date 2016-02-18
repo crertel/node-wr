@@ -8,7 +8,7 @@ var argv = parseArgs( process.argv , {
   boolean: [ 'debug']
 });
 
-var portname = argv.port || 'NULL';
+var port = argv.port || 'NULL';
 var debug = argv.debug || false;
 var comport = argv.comport;
 
