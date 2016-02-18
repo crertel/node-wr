@@ -30,7 +30,7 @@ function WaterRower( opts ) {
   this.serialPort = new serialport.SerialPort( this.comPort, {
     baudrate: this.baudRate,
     disconnectedCallback: function () { this.emit('disconnect'); }.bind(this),
-    parser: serialport.parsers.readline("\n")
+    parser: serialport.parsers.readline("\r\n")
   });
 
   this.serialPort.on("open", function () {
@@ -58,16 +58,16 @@ function WaterRower( opts ) {
 }
 util.inherits(WaterRower, EventEmitter);
 
-var msgPing = /^PING\r\n$/;
-var msgError = /^ERROR\r\n$/;
-var msgStrokeStart = /^SS\r\n$/;
-var msgStrokeEnd = /^SE\r\n$/;
-var msgStrokePulse = /^P(\d|[A-Fa-f]){2}\r\n$/;
-var msgStrokeCount = /^IDD140(\d|[A-Fa-f]){2}\r\n$/;
-var msgTotalSpeed = /^IDD148(\d|[A-Fa-f]){2}\r\n$/;
-var msgAverageSpeed = /^IDD14A(\d|[A-Fa-f]){2}\r\n$/;
-var msgDistance = /^IDD057(\d|[A-Fa-f]){2}\r\n$/;
-var msgHeartrate = /^IDD1A0(\d|[A-Fa-f]){2}\r\n$/;
+var msgPing = /^PING$/;
+var msgError = /^ERROR$/;
+var msgStrokeStart = /^SS$/;
+var msgStrokeEnd = /^SE$/;
+var msgStrokePulse = /^P(\d|[A-Fa-f]){2}$/;
+var msgStrokeCount = /^IDD140(\d|[A-Fa-f]){2}$/;
+var msgTotalSpeed = /^IDD148(\d|[A-Fa-f]){2}$/;
+var msgAverageSpeed = /^IDD14A(\d|[A-Fa-f]){2}$/;
+var msgDistance = /^IDD057(\d|[A-Fa-f]){2}$/;
+var msgHeartrate = /^IDD1A0(\d|[A-Fa-f]){2}$/;
 
 WaterRower.prototype.ingestMessage = function( msg ) {
   debug('port ' + this.comPort + ' dispatch ' + msg );
