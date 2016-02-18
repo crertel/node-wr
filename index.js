@@ -113,7 +113,7 @@ WaterRower.prototype.stateConnected = function ( msg ) {
 WaterRower.prototype.stateAwaitingStrokeCount = function ( msg ) {
   debug('in state awaiting stroke count');
 
-  var matches = msg.matches(msgStrokeCount);
+  var matches = msg.match(msgStrokeCount);
   if (matches){
     // parse out the stroke count in the 'IDD140??\r\n' message,
     this.readings.strokeCount = Number.parseInt( matches[1], 16);
@@ -128,7 +128,7 @@ WaterRower.prototype.stateAwaitingStrokeCount = function ( msg ) {
 WaterRower.prototype.stateAwaitingTotalSpeed = function ( msg ) {
   debug('in state awaiting total speed');
 
-  var matches = msg.matches(msgTotalSpeed);
+  var matches = msg.match(msgTotalSpeed);
   if (matches){
     // parse out the total speed in the 'IDD148??\r\n' message,
     this.readings.totalSpeed = Number.parseInt( matches[1], 16);
@@ -143,7 +143,7 @@ WaterRower.prototype.stateAwaitingTotalSpeed = function ( msg ) {
 WaterRower.prototype.stateAwaitingAverageSpeed = function ( msg ) {
   debug('in state awaiting average speed');
 
-  var matches = msg.matches(msgAverageSpeed);
+  var matches = msg.match(msgAverageSpeed);
   if (matches) {
     // parse out the average speed in the 'IDD057??\r\n' message,
     this.readings.averageSpeed = Number.parseInt( matches[1], 16);
@@ -158,7 +158,7 @@ WaterRower.prototype.stateAwaitingAverageSpeed = function ( msg ) {
 WaterRower.prototype.stateAwaitingDistance = function ( msg ) {
   debug('in state awaiting distance');
 
-  var matches = msg.matches(msgDistance);
+  var matches = msg.match(msgDistance);
   if (matches){
     // parse out the distance in the 'IDD057??\r\n' message,
     this.readings.distance = Number.parseInt( matches[1], 16);
@@ -173,7 +173,7 @@ WaterRower.prototype.stateAwaitingDistance = function ( msg ) {
 WaterRower.prototype.stateAwaitingHeartrate = function ( msg ) {
   debug('in state awaiting heart rate');
 
-  var matches = msg.matches(msgHeartrate);
+  var matches = msg.match(msgHeartrate);
   if (matches){
     // parse out the stroke count in the 'IDD057??\r\n' message,
     this.readings.heartRate = Number.parseInt( matches[1], 16);
