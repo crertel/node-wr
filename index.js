@@ -62,12 +62,12 @@ var msgPing = /^PING$/;
 var msgError = /^ERROR$/;
 var msgStrokeStart = /^SS$/;
 var msgStrokeEnd = /^SE$/;
-var msgStrokePulse = /^P(\d|[A-Fa-f]){2}$/;
-var msgStrokeCount = /^IDD140(\d|[A-Fa-f]){4}$/;
-var msgTotalSpeed = /^IDD148(\d|[A-Fa-f]){4}$/;
-var msgAverageSpeed = /^IDD14A(\d|[A-Fa-f]){4}$/;
-var msgDistance = /^IDD057(\d|[A-Fa-f]){4}$/;
-var msgHeartrate = /^IDD1A0(\d|[A-Fa-f]){4}$/;
+var msgStrokePulse = /^P([\dA-Fa-f]{2})$/;
+var msgStrokeCount = /^IDD140([\dA-Fa-f]{4})$/;
+var msgTotalSpeed = /^IDD148([\dA-Fa-f]{4})$/;
+var msgAverageSpeed = /^IDD14A([\dA-Fa-f]{4})$/;
+var msgDistance = /^IDD057([\dA-Fa-f]{4})$/;
+var msgHeartrate = /^IDD1A0([\dA-Fa-f]{4})$/;
 
 WaterRower.prototype.ingestMessage = function( msg ) {
   debug('port ' + this.comPort + ' dispatch ' + msg );
