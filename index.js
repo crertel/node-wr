@@ -9,7 +9,7 @@ function WaterRower( opts ) {
   EventEmitter.call(this);
 
   this.comPort = opts.port || "";
-  this.baudRate = opts.baudRate || 19200;//115200;
+  this.baudRate = opts.baudRate || 115200;
   this.pollRate = opts.pollRate || 800;
   this.lastPing = null;
   this.stateHandler = this.stateDisconnected;
@@ -76,7 +76,7 @@ WaterRower.prototype.ingestMessage = function( msg ) {
   this.lastPing = Date.now();
 
   switch(true) {
-    //case msgPing.test(msg):           break;
+    case msgPing.test(msg):           break;
     case msgError.test(msg):          this.emit('error', 'error from water rower');
                                       break;
     case msgStrokeStart.test(msg):    this.emit('stroke start');
@@ -174,7 +174,7 @@ WaterRower.prototype.stateAwaitingHeartrate = function ( msg ) {
     this.serialPort.write('IRD057\r\n');
     return this.stateConnected;
   } else {
-    return this.stateAwaitingDistance;
+    return this.stateAwaitingHeartrate;
   }
 }
 
