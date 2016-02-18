@@ -109,10 +109,11 @@ WaterRower.prototype.stateConnected = function ( msg ) {
 
 WaterRower.prototype.stateAwaitingStrokeCount = function ( msg ) {
   debug('in state awaiting stroke count');
-  // when awaiting stroke count, we only care about a certain message
-  if (msgStrokeCount.test(msg)){
+
+  var matches = msg.matches(msgStrokeCount);
+  if (matches){
     // parse out the stroke count in the 'IDD140??\r\n' message,
-    this.readings.strokeCount = Number.parseInt( msg.substring(6), 16);
+    this.readings.strokeCount = Number.parseInt( matches[1], 16);
 
     this.serialPort.write('IRD148\r\n');
     return this.stateAwaitingTotalSpeed;
@@ -123,10 +124,11 @@ WaterRower.prototype.stateAwaitingStrokeCount = function ( msg ) {
 
 WaterRower.prototype.stateAwaitingTotalSpeed = function ( msg ) {
   debug('in state awaiting total speed');
-  // when awaiting stroke count, we only care about a certain message
-  if (msgTotalSpeed.test(msg)){
+
+  var matches = msg.matches(msgTotalSpeed);
+  if (matches){
     // parse out the total speed in the 'IDD148??\r\n' message,
-    this.readings.totalSpeed = Number.parseInt( msg.substring(6), 16);
+    this.readings.totalSpeed = Number.parseInt( matches[1], 16);
 
     this.serialPort.write('IRD14A\r\n');
     return this.stateAwaitingAverageSpeed;
@@ -137,10 +139,11 @@ WaterRower.prototype.stateAwaitingTotalSpeed = function ( msg ) {
 
 WaterRower.prototype.stateAwaitingAverageSpeed = function ( msg ) {
   debug('in state awaiting average speed');
-  // when awaiting stroke count, we only care about a certain message
-  if (msgAverageSpeed.test(msg)){
-    // parse out the stroke count in the 'IDD057??\r\n' message,
-    this.readings.averageSpeed = Number.parseInt( msg.substring(6), 16);
+
+  var matches = msg.matches(msgAverageSpeed);
+  if (matches) {
+    // parse out the average speed in the 'IDD057??\r\n' message,
+    this.readings.averageSpeed = Number.parseInt( matches[1], 16);
 
     this.serialPort.write('IRD057\r\n');
     return this.stateAwaitingDistance;
@@ -152,10 +155,10 @@ WaterRower.prototype.stateAwaitingAverageSpeed = function ( msg ) {
 WaterRower.prototype.stateAwaitingDistance = function ( msg ) {
   debug('in state awaiting distance');
 
-  // when awaiting stroke count, we only care about a certain message
-  if (msgDistance.test(msg)){
-    // parse out the stroke count in the 'IDD057??\r\n' message,
-    this.readings.averageSpeed = Number.parseInt( msg.substring(6), 16);
+  var matches = msg.matches(msgDistance);
+  if (matches){
+    // parse out the distance in the 'IDD057??\r\n' message,
+    this.readings.distance = Number.parseInt( matches[1], 16);
 
     this.serialPort.write('IRD1A0\r\n');
     return this.stateAwaitingHeartrate;
@@ -166,10 +169,11 @@ WaterRower.prototype.stateAwaitingDistance = function ( msg ) {
 
 WaterRower.prototype.stateAwaitingHeartrate = function ( msg ) {
   debug('in state awaiting heart rate');
-  // when awaiting stroke count, we only care about a certain message
-  if (msgHeartrate.test(msg)){
+
+  var matches = msg.matches(msgHeartrate);
+  if (matches){
     // parse out the stroke count in the 'IDD057??\r\n' message,
-    this.readings.averageSpeed = Number.parseInt( msg.substring(6), 16);
+    this.readings.heartRate = Number.parseInt( matches[1], 16);
 
     this.serialPort.write('IRD057\r\n');
     return this.stateConnected;
