@@ -63,11 +63,11 @@ var msgError = /^ERROR$/;
 var msgStrokeStart = /^SS$/;
 var msgStrokeEnd = /^SE$/;
 var msgStrokePulse = /^P(\d|[A-Fa-f]){2}$/;
-var msgStrokeCount = /^IDD140(\d|[A-Fa-f]){2}$/;
-var msgTotalSpeed = /^IDD148(\d|[A-Fa-f]){2}$/;
-var msgAverageSpeed = /^IDD14A(\d|[A-Fa-f]){2}$/;
-var msgDistance = /^IDD057(\d|[A-Fa-f]){2}$/;
-var msgHeartrate = /^IDD1A0(\d|[A-Fa-f]){2}$/;
+var msgStrokeCount = /^IDD140(\d|[A-Fa-f]){4}$/;
+var msgTotalSpeed = /^IDD148(\d|[A-Fa-f]){4}$/;
+var msgAverageSpeed = /^IDD14A(\d|[A-Fa-f]){4}$/;
+var msgDistance = /^IDD057(\d|[A-Fa-f]){4}$/;
+var msgHeartrate = /^IDD1A0(\d|[A-Fa-f]){4}$/;
 
 WaterRower.prototype.ingestMessage = function( msg ) {
   debug('port ' + this.comPort + ' dispatch ' + msg );
@@ -76,7 +76,7 @@ WaterRower.prototype.ingestMessage = function( msg ) {
   this.lastPing = Date.now();
 
   switch(true) {
-    case msgPing.test(msg):           break;
+    //case msgPing.test(msg):           break;
     case msgError.test(msg):          this.emit('error', 'error from water rower');
                                       break;
     case msgStrokeStart.test(msg):    this.emit('stroke start');
@@ -90,12 +90,12 @@ WaterRower.prototype.ingestMessage = function( msg ) {
 
 WaterRower.prototype.stateDisconnected = function ( msg ) {
   debug('in state disconnected');
-  if (msg==='_WR_\r\n') {
+  if (msg==='_WR_') {
     this.emit('connect');
     this.serialPort.emit('data', "let's start this party");
     return this.stateConnected;
   } else {
-    return this.stateDisconnected
+    return this.stateDisconnected;
   }
 }
 
