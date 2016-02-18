@@ -1,4 +1,4 @@
-var wr = require('./index.js')({ debug: false} );
+var wr = require('./water_rower.js')({ debug: false} );
 var ws = require('ws');
 
 var parseArgs = require('minimist');
