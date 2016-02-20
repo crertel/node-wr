@@ -62,6 +62,7 @@ util.inherits(WaterRower, EventEmitter);
 
 var msgOnline = /^_WR_$/;
 var msgOkay = /^OK$/;
+var msgInteractive = /^AIA$/;
 var msgPing = /^PING$/;
 var msgError = /^ERROR$/;
 var msgStrokeStart = /^SS$/;
@@ -73,6 +74,7 @@ var msgAverageSpeed = /^IDD14A([\dA-Fa-f]{4})$/;
 var msgDistance = /^IDD057([\dA-Fa-f]{4})$/;
 var msgHeartrate = /^IDD1A0([\dA-Fa-f]{4})$/;
 var msgStrokeInfo = /^IDD142([\dA-Fa-f]{2})([\dA-Fa-f]{2})$/;
+var msgKepress = /^AK([123456789Rr]{1})$/;
 
 WaterRower.prototype.ingestMessage = function( msg ) {
   debug('port ' + this.comPort + ' dispatch ' + msg );
@@ -80,17 +82,25 @@ WaterRower.prototype.ingestMessage = function( msg ) {
   // we consider *any* message, not just PING, as a confirmation of the controllers existence
   this.lastPing = Date.now();
 
-  switch(true) {
+  // handle key presses
+  var keypress = msgKepress.match(msg);
+  if (keypress) {
+    this.emit('keypad', { key: keypress[1] });
+  } else {
+    // handle other messages
+    switch(true) {
 
-    case msgError.test(msg):          this.emit('error', 'error from water rower');
-                                      break;
-    case msgStrokeStart.test(msg):    this.emit('stroke start');
-                                      break;
-    case msgStrokeEnd.test(msg):      this.emit('stroke end');
-                                      break;
-    case msgPing.test(msg):           // fallthrough
-    default:                          this.stateHandler = this.stateHandler( msg );
-                                      break;
+      case msgError.test(msg):          this.emit('error', 'error from water rower');
+                                        break;
+      case msgStrokeStart.test(msg):    this.emit('stroke start');
+                                        break;
+      case msgStrokeEnd.test(msg):      this.emit('stroke end');
+                                        break;
+      case msgPing.test(msg):           // fallthrough
+      default:                          this.stateHandler = this.stateHandler( msg );
+                                        break;
+    }
+
   }
 };
 
@@ -113,23 +123,35 @@ WaterRower.prototype.stateDisconnected = function ( msg ) {
     //this.serialPort.emit('data', "let's start this party");
     this.serialPort.write('RESET\r\n');
 
-    return this.statePreconnect;
+    return this.statePreconnect1;
   } else {
     return this.stateDisconnected;
   }
 }
 
-WaterRower.prototype.statePreconnect = function ( msg ) {
-  debug('in state preconnect ' + msg);
+WaterRower.prototype.statePreconnect1 = function ( msg ) {
+  debug('in state preconnect 1' + msg);
 
   if ( msgOkay.test(msg) ) {
+    this.serialPort.write('AIS\r\n');
+    return this.statePreconnect2;
+  } else {
+    return this.statePreconnect1;
+  }
+}
+
+WaterRower.prototype.statePreconnect2 = function ( msg ) {
+  debug('in state preconnect 2' + msg);
+
+  if ( msgInteractive.test(msg) ) {
     this.emit('connect');
     this.serialPort.emit('data', "let's start this party");
     return this.stateConnected;
   } else {
-    return this.statePreconnect;
+    return this.statePreconnect2;
   }
 }
+
 
 WaterRower.prototype.stateConnected = function ( msg ) {
   debug('in state connected');
