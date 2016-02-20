@@ -15,13 +15,13 @@ function WaterRower( opts ) {
   this.stateHandler = this.stateDisconnected;
 
   this.readings = {
-    strokeAvgTime: 0,
-    strokeAvgPull: 0,
-    strokeCount: 0,
-    totalSpeed: 0,
-    averageSpeed: 0,
-    distance: 0,
-    heartRate: 0
+    strokeAvgTime: 0,     // ?
+    strokeAvgPull: 0,     // ?
+    strokeCount: 0,       // number
+    totalSpeed: 0,        // cm/s
+    averageSpeed: 0,      // cm/s
+    distance: 0,          // m
+    heartRate: 0          // bpm
   };
 
   debug("Creating new water rower");
@@ -98,10 +98,24 @@ WaterRower.prototype.stateDisconnected = function ( msg ) {
 
   if ( msgOnline.test(msg) ) {
     this.emit('connect');
+    //this.serialPort.emit('data', "let's start this party");
+    this.serialPort.write('RESET\r\n');
+
+    return this.statePreconnect;
+  } else {
+    return this.stateDisconnected;
+  }
+}
+
+WaterRower.prototype.statePreconnect = function ( msg ) {
+  debug('in state disconnected ' + msg);
+
+  if ( msgOnline.test(msg) ) {
+    this.emit('connect');
     this.serialPort.emit('data', "let's start this party");
     return this.stateConnected;
   } else {
-    return this.stateDisconnected;
+    return this.statePreconnect;
   }
 }
 
