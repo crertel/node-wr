@@ -9,7 +9,7 @@ function WaterRower( opts ) {
   EventEmitter.call(this);
 
   this.comPort = opts.port || "";
-  this.baudRate = opts.baudRate || 115200;
+  this.baudRate = opts.baudRate || 19200;//115200;
   this.pollRate = opts.pollRate || 800;
   this.lastPing = null;
   this.stateHandler = this.stateDisconnected;
