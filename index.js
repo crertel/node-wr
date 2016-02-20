@@ -1,10 +1,3 @@
-var server = require('http').createServer()
-var wr = require('./water_rower.js')({ debug: debug} );
-var ws = require('ws');
-var url = require('url')
-var WebSocketServer = ws.Server
-var wsServer = new WebSocketServer({ server: server });
-
 var parseArgs = require('minimist');
 var argv = parseArgs( process.argv , {
   number: [ 'port' ],
@@ -17,7 +10,13 @@ var debug = argv.debug || false;
 var comport = argv.comport;
 
 
+var server = require('http').createServer()
+var ws = require('ws');
+var url = require('url')
+var WebSocketServer = ws.Server
+var wsServer = new WebSocketServer({ server: server });
 
+var wr = require('./water_rower.js')({ debug: debug} );
 var express = require('express');
 var app = express();
 app.get('/', express.static(__dirname+'/public') );
