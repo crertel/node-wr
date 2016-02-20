@@ -16,21 +16,26 @@ var port = argv.port || 'NULL';
 var debug = argv.debug || false;
 var comport = argv.comport;
 
-var rower = new wr.WaterRower({ port: comport });
+
 
 var express = require('express');
 var app = express();
 app.get('/', express.static(__dirname+'/public') );
 
-rower.on('readings', function _broadcastReadings( msg ) {
-  wsServer.clients.forEach( function(client) {
-    client.send( JSON.stringify(msg), function(err) {
-      if (err) {
-        console.log(err.toString());
-      }
+var rower;
+
+function setupRower() {
+  rower = new wr.WaterRower({ port: comport });
+  rower.on('readings', function _broadcastReadings( msg ) {
+    wsServer.clients.forEach( function(client) {
+      client.send( JSON.stringify(msg), function(err) {
+        if (err) {
+          console.log(err.toString());
+        }
+      });
     });
   });
-});
+}
 
 wsServer.on('connection', function connection(sock) {
   var location = url.parse(sock.upgradeReq.url, true);
@@ -41,6 +46,15 @@ wsServer.on('connection', function connection(sock) {
 
   sock.on('message', function _socketMessage(msg){
     console.log("Socket sent message: ", msg.toString() );
+    try {
+      var parsedMsg = JSON.parse(msg);
+      if (parsedMsg.msg === 'reset rower') {
+        setupRower();
+      }
+    } catch (e) {
+      console.log('Error handling message: ', e.toString());
+    }
+    if ()
   });
 
   console.log("Socket connect.");
