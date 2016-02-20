@@ -22,7 +22,9 @@ function WaterRower( opts ) {
     averageSpeed: 0,      // cm/s
     distance: 0,          // m
     heartRate: 0,         // bpm
-    workoutTime: 0        // workout time
+    displayTimeSeconds: 0,
+    displayTimeMinutes: 0,
+    displayTimeHours: 0,
   };
 
   debug("Creating new water rower");
@@ -76,7 +78,7 @@ var msgDistance = /^IDD057([\dA-Fa-f]{4})$/;
 var msgHeartrate = /^IDD1A0([\dA-Fa-f]{4})$/;
 var msgStrokeInfo = /^IDD142([\dA-Fa-f]{2})([\dA-Fa-f]{2})$/;
 var msgKeypress = /^AK([123456789Rr]{1})$/;
-var msgWorkoutTime = /^IDT1E8([\dA-Fa-f]{2})([\dA-Fa-f]{2})([\dA-Fa-f]{2})$/;
+var msgWorkoutTime = /^IDT1E1([\dA-Fa-f]{2})([\dA-Fa-f]{2})([\dA-Fa-f]{2})$/;
 
 WaterRower.prototype.ingestMessage = function( msg ) {
   debug('port ' + this.comPort + ' dispatch ' + msg );
