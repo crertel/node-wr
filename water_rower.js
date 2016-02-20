@@ -76,7 +76,7 @@ var msgDistance = /^IDD057([\dA-Fa-f]{4})$/;
 var msgHeartrate = /^IDD1A0([\dA-Fa-f]{4})$/;
 var msgStrokeInfo = /^IDD142([\dA-Fa-f]{2})([\dA-Fa-f]{2})$/;
 var msgKeypress = /^AK([123456789Rr]{1})$/;
-var msgWorkoutTime = /^IDD1E8([\dA-Fa-f]{4})$/;
+var msgWorkoutTime = /^IDT1E8([\dA-Fa-f]{2})([\dA-Fa-f]{2})([\dA-Fa-f]{2})$/;
 
 WaterRower.prototype.ingestMessage = function( msg ) {
   debug('port ' + this.comPort + ' dispatch ' + msg );
@@ -228,7 +228,7 @@ WaterRower.prototype.stateAwaitingStrokeInfo = function ( msg ) {
     this.readings.strokeAvgTime = Number.parseInt( matches[1], 16);
     this.readings.strokeAvgPull = Number.parseInt( matches[2], 16);
 
-    this.serialPort.write('IRD1E8\r\n');
+    this.serialPort.write('IRT1E1\r\n');
     return this.stateAwaitingWorkoutTime;
   } else {
     return this.stateAwaitingStrokeInfo;
@@ -240,7 +240,9 @@ WaterRower.prototype.stateAwaitingWorkoutTime = function ( msg ) {
 
   var matches = msg.match(msgWorkoutTime);
   if (matches){
-    this.readings.workoutTime = Number.parseInt( matches[1], 16);
+    this.readings.displayTimeSecs =     Number.parseInt( matches[1], 16);
+    this.readings.displayTimeMinutes =  Number.parseInt( matches[2], 16);
+    this.readings.displayTimeHours =    Number.parseInt( matches[3], 16);
 
     this.serialPort.write('IRD057\r\n');
     return this.stateConnected;
