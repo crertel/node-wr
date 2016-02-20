@@ -44,11 +44,13 @@ function setupRower() {
     broadcastClients( {
       type: 'readings',
       data: msg
-    })
+    });
   });
   rower.on('keypad', function(msg){
-    type: 'keypad',
-    data: msg
+    broadcastClients( {
+      type: 'keypad',
+      data: msg
+    });
   });
 }
 
