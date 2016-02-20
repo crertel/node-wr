@@ -22,16 +22,16 @@ var express = require('express');
 var app = express();
 app.get('/', express.static(__dirname+'/public') );
 
+rower.on('readings', function _broadcastReadings( msg ) {
+  wsServer.clients.forEach( function(client) {
+    client.send( JSON.stringify(msg) );
+  });
+});
+
 wsServer.on('connection', function connection(sock) {
   var location = url.parse(sock.upgradeReq.url, true);
-  var updateListener = function(msg) {
-    sock.send( JSON.stringify(msg) );
-  };
 
-  rower.on('readings', updateListener);
-
-  sock.on('disconnect', function() {
-    rower.removeListener(updateListener);
+  sock.on('disconnect', function _accounceDisconnect(){
     console.log("Socket disconnect.");
   });
 

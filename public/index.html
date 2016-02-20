@@ -6,14 +6,21 @@
   </head>
   <body>
     <h1> Water Rower </h1>
+    <button id="reset_button"> Reset </button>
     <div>
       <ul id="stats">
       </ul>
     </div>
 
     <script>
-      var $stats = document.getElementById("stats");
       var ws = new WebSocket("ws://" + location.host);
+      var $resetButton = document.getElementById("reset_button");
+      var $stats = document.getElementById("stats");
+
+      $resetButton.onclick = function postReset() {
+        ws.send({ msg: "reset rower"});
+      };
+
       ws.onmessage = function(msg) {
         var readings = JSON.parse(msg.data);
         $stats.innerHTML = "";
