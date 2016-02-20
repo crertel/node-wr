@@ -8,12 +8,14 @@
     <h1> Water Rower </h1>
     <button id="reset_button"> Reset </button>
     <div>
+      <span id="keypad"> </span>
       <ul id="stats">
       </ul>
     </div>
 
     <script>
       var ws = new WebSocket("ws://" + location.host);
+      var $keypad = document.getElementById("keypad");
       var $resetButton = document.getElementById("reset_button");
       var $stats = document.getElementById("stats");
 
@@ -22,15 +24,20 @@
         ws.send( JSON.stringify(msg) );
       };
 
-      ws.onmessage = function(msg) {
-        var readings = JSON.parse(msg.data);
-        $stats.innerHTML = "";
-        Object.keys(readings).forEach(function (k) {
-          var reading = readings[k];
-          var $reading = document.createElement('li');
-          $reading.innerHTML = "<strong>" + k + "</strong> " + reading;
-          $stats.appendChild($reading);
-        });
+      ws.onmessage = function(rawMsg) {
+        var msg = JSON.parse(rawMsg.data);
+
+        if (msg.type === 'readings') {
+          $stats.innerHTML = "";
+          Object.keys(msg.data).forEach(function (k) {
+            var reading = readings[k];
+            var $reading = document.createElement('li');
+            $reading.innerHTML = "<strong>" + k + "</strong> " + reading;
+            $stats.appendChild($reading);
+          });
+        } else if (msg.type ==='keypad') {
+          $keypad.innerHTML = 'Button: ' + msg.data;
+        }
       }
     </script>
   </body>

@@ -85,7 +85,7 @@ WaterRower.prototype.ingestMessage = function( msg ) {
   // handle key presses
   var keypress = msgKepress.match(msg);
   if (keypress) {
-    this.emit('keypad', { key: keypress[1] });
+    this.emit('keypad', keypress[1] );
   } else {
     // handle other messages
     switch(true) {
