@@ -54,7 +54,6 @@ wsServer.on('connection', function connection(sock) {
     } catch (e) {
       console.log('Error handling message: ', e.toString());
     }
-    if ()
   });
 
   console.log("Socket connect.");
