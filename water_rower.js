@@ -15,6 +15,8 @@ function WaterRower( opts ) {
   this.stateHandler = this.stateDisconnected;
 
   this.readings = {
+    strokeAvgTime: 0,
+    strokeAvgPull: 0,
     strokeCount: 0,
     totalSpeed: 0,
     averageSpeed: 0,
@@ -69,6 +71,7 @@ var msgTotalSpeed = /^IDD148([\dA-Fa-f]{4})$/;
 var msgAverageSpeed = /^IDD14A([\dA-Fa-f]{4})$/;
 var msgDistance = /^IDD057([\dA-Fa-f]{4})$/;
 var msgHeartrate = /^IDD1A0([\dA-Fa-f]{4})$/;
+var msgStrokeInfo = /^IDD142([\dA-Fa-f]{2})([\dA-Fa-f]{2})$/;
 
 WaterRower.prototype.ingestMessage = function( msg ) {
   debug('port ' + this.comPort + ' dispatch ' + msg );
@@ -130,7 +133,6 @@ WaterRower.prototype.stateAwaitingTotalSpeed = function ( msg ) {
 
   var matches = msg.match(msgTotalSpeed);
   if (matches){
-    // parse out the total speed in the 'IDD148??\r\n' message,
     this.readings.totalSpeed = Number.parseInt( matches[1], 16);
 
     this.serialPort.write('IRD14A\r\n');
@@ -145,7 +147,6 @@ WaterRower.prototype.stateAwaitingAverageSpeed = function ( msg ) {
 
   var matches = msg.match(msgAverageSpeed);
   if (matches) {
-    // parse out the average speed in the 'IDD057??\r\n' message,
     this.readings.averageSpeed = Number.parseInt( matches[1], 16);
 
     this.serialPort.write('IRD057\r\n');
@@ -160,7 +161,6 @@ WaterRower.prototype.stateAwaitingDistance = function ( msg ) {
 
   var matches = msg.match(msgDistance);
   if (matches){
-    // parse out the distance in the 'IDD057??\r\n' message,
     this.readings.distance = Number.parseInt( matches[1], 16);
 
     this.serialPort.write('IRD1A0\r\n');
@@ -175,8 +175,22 @@ WaterRower.prototype.stateAwaitingHeartrate = function ( msg ) {
 
   var matches = msg.match(msgHeartrate);
   if (matches){
-    // parse out the stroke count in the 'IDD057??\r\n' message,
     this.readings.heartRate = Number.parseInt( matches[1], 16);
+
+    this.serialPort.write('IRD142\r\n');
+    return this.stateAwaitingStrokeInfo;
+  } else {
+    return this.stateAwaitingHeartrate;
+  }
+}
+
+WaterRower.prototype.stateAwaitingStrokeInfo = function ( msg ) {
+  debug('in state awaiting heart rate');
+
+  var matches = msg.match(msgStrokeInfo);
+  if (matches){
+    this.readings.strokeAvgTime = Number.parseInt( matches[1], 16);
+    this.readings.strokeAvgPull = Number.parseInt( matches[2], 16);
 
     this.serialPort.write('IRD057\r\n');
     return this.stateConnected;
