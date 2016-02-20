@@ -74,7 +74,7 @@ var msgAverageSpeed = /^IDD14A([\dA-Fa-f]{4})$/;
 var msgDistance = /^IDD057([\dA-Fa-f]{4})$/;
 var msgHeartrate = /^IDD1A0([\dA-Fa-f]{4})$/;
 var msgStrokeInfo = /^IDD142([\dA-Fa-f]{2})([\dA-Fa-f]{2})$/;
-var msgKepress = /^AK([123456789Rr]{1})$/;
+var msgKeypress = /^AK([123456789Rr]{1})$/;
 
 WaterRower.prototype.ingestMessage = function( msg ) {
   debug('port ' + this.comPort + ' dispatch ' + msg );
@@ -83,7 +83,7 @@ WaterRower.prototype.ingestMessage = function( msg ) {
   this.lastPing = Date.now();
 
   // handle key presses
-  var keypress = msgKepress.match(msg);
+  var keypress = msg.match(msgKeypress);
   if (keypress) {
     this.emit('keypad', keypress[1] );
   } else {
