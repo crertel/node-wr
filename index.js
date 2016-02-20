@@ -1,5 +1,5 @@
 var server = require('http').createServer()
-var wr = require('./water_rower.js')({ debug: false} );
+var wr = require('./water_rower.js')({ debug: debug} );
 var ws = require('ws');
 var url = require('url')
 var WebSocketServer = ws.Server
