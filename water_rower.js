@@ -89,14 +89,12 @@ WaterRower.prototype.ingestMessage = function( msg ) {
   } else {
     // handle other messages
     switch(true) {
-
-      case msgError.test(msg):          this.emit('error', 'error from water rower');
-                                        break;
       case msgStrokeStart.test(msg):    this.emit('stroke start');
                                         break;
       case msgStrokeEnd.test(msg):      this.emit('stroke end');
                                         break;
       case msgPing.test(msg):           // fallthrough
+      case msgError.test(msg):          // fallthrough
       default:                          this.stateHandler = this.stateHandler( msg );
                                         break;
     }
