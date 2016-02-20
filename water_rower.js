@@ -195,7 +195,7 @@ WaterRower.prototype.stateAwaitingStrokeInfo = function ( msg ) {
     this.serialPort.write('IRD057\r\n');
     return this.stateConnected;
   } else {
-    return this.stateAwaitingHeartrate;
+    return this.stateAwaitingStrokeInfo;
   }
 }
 
