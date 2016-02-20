@@ -35,9 +35,13 @@ rower.on('readings', function _broadcastReadings( msg ) {
 wsServer.on('connection', function connection(sock) {
   var location = url.parse(sock.upgradeReq.url, true);
 
-  sock.on('disconnect', function _accounceDisconnect(){
+  sock.on('close', function _accounceDisconnect(){
     console.log("Socket disconnect.");
   });
+
+  sock.on('message', function _socketMessage(msg){
+    console.log("Socket sent message: ", msg);
+  }
 
   console.log("Socket connect.");
 });
