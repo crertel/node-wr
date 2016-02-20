@@ -18,7 +18,8 @@
       var $stats = document.getElementById("stats");
 
       $resetButton.onclick = function postReset() {
-        ws.send({ msg: "reset rower"});
+        var msg = { msg: "reset rower"};
+        ws.send( JSON.stringify(msg) );
       };
 
       ws.onmessage = function(msg) {
