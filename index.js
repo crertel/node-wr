@@ -40,7 +40,7 @@ wsServer.on('connection', function connection(sock) {
   });
 
   sock.on('message', function _socketMessage(msg){
-    console.log("Socket sent message: ", msg);
+    console.log("Socket sent message: ", JSON.stringify(msg));
   });
 
   console.log("Socket connect.");
