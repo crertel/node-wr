@@ -94,6 +94,17 @@ WaterRower.prototype.ingestMessage = function( msg ) {
   }
 };
 
+WaterRower.prototype.shutdown = function () {
+  debug('requesting shutdown');
+  this.stateHandler = this.stateShuttingDown;
+}
+
+WaterRower.prototype.stateShuttingDown = function () {
+  debug('in state shutdown');
+  this.serialPort.write('EXIT\r\n');
+  return this.stateShuttingDown;
+}
+
 WaterRower.prototype.stateDisconnected = function ( msg ) {
   debug('in state disconnected ' + msg);
 

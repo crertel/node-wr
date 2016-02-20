@@ -67,3 +67,10 @@ server.on('request', app);
 server.listen(port, function () {
   console.log('Listening on ' + server.address().port)
 });
+
+process.on('SIGINT', function() {
+  console.log("\nSIGINT (Ctrl+C)");
+  if (rower) {
+    rower.shutdown();
+  }
+});
