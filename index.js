@@ -9,6 +9,11 @@ var port = argv.port || 'NULL';
 var debug = argv.debug || false;
 var comport = argv.comport;
 
+console.log('Starting water rower.');
+console.log('\tPort: ', argv.port);
+console.log('\tCom port: ', argv.comport);
+console.log('\tDebug: ', debug);
+
 
 var server = require('http').createServer()
 var ws = require('ws');
@@ -58,7 +63,6 @@ wsServer.on('connection', function connection(sock) {
   console.log("Socket connect.");
 });
 
-console.log('Starting water rower.');
 server.on('request', app);
 server.listen(port, function () {
   console.log('Listening on ' + server.address().port)
