@@ -24,7 +24,9 @@ app.get('/', express.static(__dirname+'/public') );
 
 rower.on('readings', function _broadcastReadings( msg ) {
   wsServer.clients.forEach( function(client) {
-    client.send( JSON.stringify(msg) );
+    client.send( JSON.stringify(msg), function(err) {
+      console.log(err.toString());
+    });
   });
 });
 
