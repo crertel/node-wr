@@ -21,7 +21,8 @@ function WaterRower( opts ) {
     totalSpeed: 0,        // cm/s
     averageSpeed: 0,      // cm/s
     distance: 0,          // m
-    heartRate: 0          // bpm
+    heartRate: 0,         // bpm
+    workoutTime: 0        // workout time
   };
 
   debug("Creating new water rower");
@@ -75,6 +76,7 @@ var msgDistance = /^IDD057([\dA-Fa-f]{4})$/;
 var msgHeartrate = /^IDD1A0([\dA-Fa-f]{4})$/;
 var msgStrokeInfo = /^IDD142([\dA-Fa-f]{2})([\dA-Fa-f]{2})$/;
 var msgKeypress = /^AK([123456789Rr]{1})$/;
+var msgWorkoutTime = /^IDD1E8([\dA-Fa-f]{4})$/;
 
 WaterRower.prototype.ingestMessage = function( msg ) {
   debug('port ' + this.comPort + ' dispatch ' + msg );
@@ -226,10 +228,24 @@ WaterRower.prototype.stateAwaitingStrokeInfo = function ( msg ) {
     this.readings.strokeAvgTime = Number.parseInt( matches[1], 16);
     this.readings.strokeAvgPull = Number.parseInt( matches[2], 16);
 
+    this.serialPort.write('IRD1E8\r\n');
+    return this.stateAwaitingWorkoutTime;
+  } else {
+    return this.stateAwaitingStrokeInfo;
+  }
+}
+
+WaterRower.prototype.stateAwaitingWorkoutTime = function ( msg ) {
+  debug('in state awaiting total workout time');
+
+  var matches = msg.match(msgWorkoutTime);
+  if (matches){
+    this.readings.workoutTime = Number.parseInt( matches[1], 16);
+
     this.serialPort.write('IRD057\r\n');
     return this.stateConnected;
   } else {
-    return this.stateAwaitingStrokeInfo;
+    return this.stateAwaitingWorkoutTime;
   }
 }
 
