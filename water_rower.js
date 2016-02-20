@@ -61,6 +61,7 @@ function WaterRower( opts ) {
 util.inherits(WaterRower, EventEmitter);
 
 var msgOnline = /^_WR_$/;
+var msgOkay = /^OK$/;
 var msgPing = /^PING$/;
 var msgError = /^ERROR$/;
 var msgStrokeStart = /^SS$/;
@@ -108,9 +109,9 @@ WaterRower.prototype.stateDisconnected = function ( msg ) {
 }
 
 WaterRower.prototype.statePreconnect = function ( msg ) {
-  debug('in state disconnected ' + msg);
+  debug('in state preconnect ' + msg);
 
-  if ( msgOnline.test(msg) ) {
+  if ( msgOkay.test(msg) ) {
     this.emit('connect');
     this.serialPort.emit('data', "let's start this party");
     return this.stateConnected;
