@@ -121,35 +121,23 @@ WaterRower.prototype.stateDisconnected = function ( msg ) {
     //this.serialPort.emit('data', "let's start this party");
     this.serialPort.write('RESET\r\n');
 
-    return this.statePreconnect1;
+    return this.statePreconnect;
   } else {
     return this.stateDisconnected;
   }
 }
 
-WaterRower.prototype.statePreconnect1 = function ( msg ) {
-  debug('in state preconnect 1' + msg);
+WaterRower.prototype.statePreconnect = function ( msg ) {
+  debug('in state preconnect' + msg);
 
   if ( msgOkay.test(msg) ) {
-    this.serialPort.write('AIS\r\n');
-    return this.statePreconnect2;
-  } else {
-    return this.statePreconnect1;
-  }
-}
-
-WaterRower.prototype.statePreconnect2 = function ( msg ) {
-  debug('in state preconnect 2' + msg);
-
-  if ( msgInteractive.test(msg) ) {
     this.emit('connect');
     this.serialPort.emit('data', "let's start this party");
     return this.stateConnected;
   } else {
-    return this.statePreconnect2;
+    return this.statePreconnect;
   }
 }
-
 
 WaterRower.prototype.stateConnected = function ( msg ) {
   debug('in state connected');
