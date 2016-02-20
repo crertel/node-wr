@@ -85,5 +85,6 @@ process.on('SIGINT', function() {
   console.log("\nSIGINT (Ctrl+C)");
   if (rower) {
     rower.shutdown();
+    process.exit(0);
   }
 });
