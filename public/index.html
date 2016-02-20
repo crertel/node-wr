@@ -30,7 +30,7 @@
         if (msg.type === 'readings') {
           $stats.innerHTML = "";
           Object.keys(msg.data).forEach(function (k) {
-            var reading = readings[k];
+            var reading = msg.data[k];
             var $reading = document.createElement('li');
             $reading.innerHTML = "<strong>" + k + "</strong> " + reading;
             $stats.appendChild($reading);
