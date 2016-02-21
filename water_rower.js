@@ -179,7 +179,7 @@ WaterRower.prototype.stateAwaitingTotalSpeed = function ( msg ) {
   if (matches){
     this.readings.totalSpeed = Number.parseInt( matches[1], 16);
 
-    this.delayedWrite()'IRD14A\r\n');
+    this.delayedWrite('IRD14A\r\n');
     return this.stateAwaitingAverageSpeed;
   } else {
     return this.stateAwaitingTotalSpeed;
