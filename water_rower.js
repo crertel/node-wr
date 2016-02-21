@@ -111,9 +111,16 @@ WaterRower.prototype.shutdown = function () {
   this.stateHandler = this.stateShuttingDown;
 }
 
+var kMsgWriteDelay = 25; // wait at least 25 milleseconds as per manual
+WaterRower.protoype.delayedWrite = function( msg ) {
+  setTimoue( function() {
+    this.serialPort.write(msg);
+  }.bind(this), kMsgWriteDelay);
+}
+
 WaterRower.prototype.stateShuttingDown = function () {
   debug('in state shutdown');
-  this.serialPort.write('EXIT\r\n');
+  this.delayedWrite('EXIT\r\n');
   return this.stateShuttingDown;
 }
 
@@ -122,8 +129,7 @@ WaterRower.prototype.stateDisconnected = function ( msg ) {
 
   if ( msgOnline.test(msg) ) {
     this.emit('connect');
-    //this.serialPort.emit('data', "let's start this party");
-    this.serialPort.write('RESET\r\n');
+    this.delayedWrite('RESET\r\n');
 
     return this.statePreconnect;
   } else {
@@ -147,7 +153,7 @@ WaterRower.prototype.stateConnected = function ( msg ) {
   debug('in state connected');
   // in the conected state, we only care about starting the stroke_count chain
   this.emit('readings', this.readings);
-  this.serialPort.write('IRD1400\r\n');
+  this.delayedWrite('IRD1400\r\n');
   return this.stateAwaitingStrokeCount;
 }
 
@@ -159,7 +165,7 @@ WaterRower.prototype.stateAwaitingStrokeCount = function ( msg ) {
     // parse out the stroke count in the 'IDD140??\r\n' message,
     this.readings.strokeCount = Number.parseInt( matches[1], 16);
 
-    this.serialPort.write('IRD148\r\n');
+    this.delayedWrite('IRD148\r\n');
     return this.stateAwaitingTotalSpeed;
   } else {
     return this.stateAwaitingStrokeCount;
@@ -173,7 +179,7 @@ WaterRower.prototype.stateAwaitingTotalSpeed = function ( msg ) {
   if (matches){
     this.readings.totalSpeed = Number.parseInt( matches[1], 16);
 
-    this.serialPort.write('IRD14A\r\n');
+    this.delayedWrite()'IRD14A\r\n');
     return this.stateAwaitingAverageSpeed;
   } else {
     return this.stateAwaitingTotalSpeed;
@@ -187,7 +193,7 @@ WaterRower.prototype.stateAwaitingAverageSpeed = function ( msg ) {
   if (matches) {
     this.readings.averageSpeed = Number.parseInt( matches[1], 16);
 
-    this.serialPort.write('IRD057\r\n');
+    this.delayedWrite('IRD057\r\n');
     return this.stateAwaitingDistance;
   } else {
     return this.stateAwaitingAverageSpeed;
@@ -201,7 +207,7 @@ WaterRower.prototype.stateAwaitingDistance = function ( msg ) {
   if (matches){
     this.readings.distance = Number.parseInt( matches[1], 16);
 
-    this.serialPort.write('IRD1A0\r\n');
+    this.delayedWrite('IRD1A0\r\n');
     return this.stateAwaitingHeartrate;
   } else {
     return this.stateAwaitingDistance;
@@ -215,7 +221,7 @@ WaterRower.prototype.stateAwaitingHeartrate = function ( msg ) {
   if (matches){
     this.readings.heartRate = Number.parseInt( matches[1], 16);
 
-    this.serialPort.write('IRD142\r\n');
+    this.delayedWrite('IRD142\r\n');
     return this.stateAwaitingStrokeInfo;
   } else {
     return this.stateAwaitingHeartrate;
@@ -230,7 +236,7 @@ WaterRower.prototype.stateAwaitingStrokeInfo = function ( msg ) {
     this.readings.strokeAvgTime = Number.parseInt( matches[1], 16);
     this.readings.strokeAvgPull = Number.parseInt( matches[2], 16);
 
-    this.serialPort.write('IRT1E1\r\n');
+    this.delayedWrite('IRT1E1\r\n');
     return this.stateAwaitingWorkoutTime;
   } else {
     return this.stateAwaitingStrokeInfo;
@@ -246,7 +252,7 @@ WaterRower.prototype.stateAwaitingWorkoutTime = function ( msg ) {
     this.readings.displayTimeMinutes =  Number.parseInt( matches[2], 16);
     this.readings.displayTimeHours =    Number.parseInt( matches[3], 16);
 
-    this.serialPort.write('IRD057\r\n');
+    this.delayedWrite('IRD057\r\n');
     return this.stateConnected;
   } else {
     return this.stateAwaitingWorkoutTime;
