@@ -112,7 +112,7 @@ WaterRower.prototype.shutdown = function () {
 }
 
 var kMsgWriteDelay = 25; // wait at least 25 milleseconds as per manual
-WaterRower.protoype.delayedWrite = function( msg ) {
+WaterRower.prototype.delayedWrite = function( msg ) {
   setTimoue( function() {
     this.serialPort.write(msg);
   }.bind(this), kMsgWriteDelay);
