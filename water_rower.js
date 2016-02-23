@@ -224,7 +224,7 @@ WaterRower.prototype.stateAwaitingHeartrate = function ( msg ) {
     this.readings.heartRate = Number.parseInt( matches[1], 16);
 
     //this.delayedWrite('IRD142\r\n');
-    this.delayedWrite('IRD1A9\r\n');
+    this.delayedWrite('IRS1A9\r\n');
     return this.stateAwaitingStrokeInfo;
   } else {
     return this.stateAwaitingHeartrate;
