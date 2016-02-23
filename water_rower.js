@@ -248,7 +248,7 @@ WaterRower.prototype.stateAwaitingWorkoutTime = function ( msg ) {
 
   var matches = msg.match(msgWorkoutTime);
   if (matches){
-    this.readings.displayTimeSecs =     Number.parseInt( matches[1], 10);
+    this.readings.displayTimeSeconds =     Number.parseInt( matches[1], 10);
     this.readings.displayTimeMinutes =  Number.parseInt( matches[2], 10);
     this.readings.displayTimeHours =    Number.parseInt( matches[3], 10);
 
