@@ -9,19 +9,29 @@
     <button id="reset_button"> Reset </button>
     <div>
       <span id="keypad"> </span>
-      <ul id="stats">
-      </ul>
 
-      <span id="strokesPerMinute">Strokes per minute</span>
-      <span id="elapsedTime">Elapsed time </span>
-      <span id="totalDistance">Total distance </span>
+      <p id="strokesPerMinute">
+        <span id="-strokesPerMinute"></span> <br>
+        Strokes per minute
+      </p>
+      <p id="elapsedTime">
+        <span id="-elapsedTime"></span> <br>
+        Elapsed time
+      </p>
+      <p id="totalDistance">
+        <span id="-totalDistance"></span> <br>
+        Total distance
+      </p>
     </div>
 
     <script>
       var ws = new WebSocket("ws://" + location.host);
       var $keypad = document.getElementById("keypad");
       var $resetButton = document.getElementById("reset_button");
-      var $stats = document.getElementById("stats");
+
+      var $dispStrokesPerMinute = document.getElementById('-strokesPerMinute');
+      var $dispElapsedTime = document.getElementById('-elapsedTime');
+      var $dispTotalDistance = document.getElementById('-totalDistance');
 
       $resetButton.onclick = function postReset() {
         var msg = { msg: "reset rower"};
@@ -32,17 +42,32 @@
         var msg = JSON.parse(rawMsg.data);
 
         if (msg.type === 'readings') {
-          $stats.innerHTML = "";
-          Object.keys(msg.data).forEach(function (k) {
-            var reading = msg.data[k];
-            var $reading = document.createElement('li');
-            $reading.innerHTML = "<strong>" + k + "</strong> " + reading;
-            $stats.appendChild($reading);
-          });
+          $dispElapsedTime.innerHTML = (msg.data.displayTimeHours > 9) ? msg.data.displayTimeHours : ("0"+msg.data.displayTimeHours) + ":"
+                                       + (msg.data.displayTimeMinutes > 9) ? msg.data.displayTimeMinutes : ("0"+msg.data.displayTimeMinutes) + ":"
+                                       + (msg.data.displayTimeSeconds > 9) ? msg.data.displayTimeSeconds : ("0"+msg.data.displayTimeSeconds);
+
+          $dispTotalDistance.innerHTML = msg.data.distance;
+          $dispStrokesPerMinute.innerHTML = msg.data.strokesPerMinute;
+
         } else if (msg.type ==='keypad') {
           $keypad.innerHTML = 'Button: ' + msg.data;
         }
       }
+
+      /*
+      Readings may be:
+      this.readings = {
+        strokesPerMinute: 0,  // "stroke_pull is first subtracted from stroke_average then a modifier of 1.25 multipled by the result to generate the ratio value for display"
+        strokeCount: 0,       // number
+        totalSpeed: 0,        // cm/s
+        averageSpeed: 0,      // cm/s
+        distance: 0,          // m
+        heartRate: 0,         // bpm
+        displayTimeSeconds: 0,
+        displayTimeMinutes: 0,
+        displayTimeHours: 0
+      };
+      */
     </script>
   </body>
 </html>
