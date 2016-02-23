@@ -17,6 +17,7 @@ function WaterRower( opts ) {
   this.readings = {
     strokeAvgTime: 0,     // ?
     strokeAvgPull: 0,     // ?
+    strokesPerMinute: 0,  // "stroke_pull is first subtracted from stroke_average then a modifier of 1.25 multipled by the result to generate the ratio value for display"
     strokeCount: 0,       // number
     totalSpeed: 0,        // cm/s
     averageSpeed: 0,      // cm/s
@@ -235,6 +236,7 @@ WaterRower.prototype.stateAwaitingStrokeInfo = function ( msg ) {
   if (matches){
     this.readings.strokeAvgTime = Number.parseInt( matches[1], 16);
     this.readings.strokeAvgPull = Number.parseInt( matches[2], 16);
+    this.readings.strokesPerMinute = ()(this.readings.strokeAvgTime - this.readings.strokeAvgPull) * 1.25) / 60.0;
 
     this.delayedWrite('IRT1E1\r\n');
     return this.stateAwaitingWorkoutTime;
