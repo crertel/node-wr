@@ -15,8 +15,8 @@ function WaterRower( opts ) {
   this.stateHandler = this.stateDisconnected;
 
   this.readings = {
-    strokeAvgTime: 0,     // ?
-    strokeAvgPull: 0,     // ?
+    //strokeAvgTime: 0,     // ?
+    //strokeAvgPull: 0,     // ?
     strokesPerMinute: 0,  // "stroke_pull is first subtracted from stroke_average then a modifier of 1.25 multipled by the result to generate the ratio value for display"
     strokeCount: 0,       // number
     totalSpeed: 0,        // cm/s
@@ -78,6 +78,7 @@ var msgAverageSpeed = /^IDD14A([\dA-Fa-f]{4})$/;
 var msgDistance = /^IDD057([\dA-Fa-f]{4})$/;
 var msgHeartrate = /^IDD1A0([\dA-Fa-f]{4})$/;
 var msgStrokeInfo = /^IDD142([\dA-Fa-f]{2})([\dA-Fa-f]{2})$/;
+var msgStrokeRate = /^IDS1A9([\dA-Fa-f]{2})$/;
 var msgKeypress = /^AK([123456789Rr]{1})$/;
 var msgWorkoutTime = /^IDT1E1([\dA-Fa-f]{2})([\dA-Fa-f]{2})([\dA-Fa-f]{2})$/;
 
@@ -222,7 +223,8 @@ WaterRower.prototype.stateAwaitingHeartrate = function ( msg ) {
   if (matches){
     this.readings.heartRate = Number.parseInt( matches[1], 16);
 
-    this.delayedWrite('IRD142\r\n');
+    //this.delayedWrite('IRD142\r\n');
+    this.delayedWrite('IRD1A9\r\n');
     return this.stateAwaitingStrokeInfo;
   } else {
     return this.stateAwaitingHeartrate;
@@ -232,11 +234,13 @@ WaterRower.prototype.stateAwaitingHeartrate = function ( msg ) {
 WaterRower.prototype.stateAwaitingStrokeInfo = function ( msg ) {
   debug('in state awaiting heart rate');
 
-  var matches = msg.match(msgStrokeInfo);
+  //var matches = msg.match(msgStrokeInfo);
+  var matches = msg.match(msgStrokeRate);
   if (matches){
-    this.readings.strokeAvgTime = Number.parseInt( matches[2], 16);
-    this.readings.strokeAvgPull = Number.parseInt( matches[1], 16);
-    this.readings.strokesPerMinute = ((this.readings.strokeAvgTime - this.readings.strokeAvgPull) * 1.25);
+    //this.readings.strokeAvgTime = Number.parseInt( matches[2], 16);
+    //this.readings.strokeAvgPull = Number.parseInt( matches[1], 16);
+    //this.readings.strokesPerMinute = ((this.readings.strokeAvgTime - this.readings.strokeAvgPull) * 1.25);
+    this.readings.strokesPerMinute = Number.parseInt( matches[1], 16);
 
     this.delayedWrite('IRT1E1\r\n');
     return this.stateAwaitingWorkoutTime;
