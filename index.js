@@ -15,10 +15,10 @@ console.log('\tCom port: ', argv.comport);
 console.log('\tDebug: ', debug);
 
 
-var server = require('http').createServer()
+var server = require('http').createServer();
 var ws = require('ws');
-var url = require('url')
-var WebSocketServer = ws.Server
+var url = require('url');
+var WebSocketServer = ws.Server;
 var wsServer = new WebSocketServer({ server: server });
 
 var wr = require('./water_rower.js')({ debug: debug} );
@@ -28,14 +28,20 @@ app.get('/', express.static(__dirname+'/public') );
 
 var rower;
 
-function broadcastClients(msg){
-  wsServer.clients.forEach( function(client) {
-    client.send( JSON.stringify(msg), function(err) {
-      if (err) {
-        console.log(err.toString());
-      }
+
+var lastBroadcast = Date.now();
+function broadcastClients(msg, cooldown){
+  var currTime = Date.now();
+  if ( (currTime - lastBroadcast) >= (cooldown || 0) ) {
+    lastBroadcast = currTime;
+    wsServer.clients.forEach( function(client) {
+      client.send( JSON.stringify(msg), function(err) {
+        if (err) {
+          console.log(err.toString());
+        }
+      });
     });
-  });
+  }
 }
 
 function setupRower() {
@@ -44,7 +50,7 @@ function setupRower() {
     broadcastClients( {
       type: 'readings',
       data: msg
-    });
+    },100);
   });
   rower.on('keypad', function(msg){
     broadcastClients( {
