@@ -234,9 +234,9 @@ WaterRower.prototype.stateAwaitingStrokeInfo = function ( msg ) {
 
   var matches = msg.match(msgStrokeInfo);
   if (matches){
-    this.readings.strokeAvgTime = Number.parseInt( matches[1], 16);
-    this.readings.strokeAvgPull = Number.parseInt( matches[2], 16);
-    this.readings.strokesPerMinute = ((this.readings.strokeAvgTime - this.readings.strokeAvgPull) * 1.25) / 60.0;
+    this.readings.strokeAvgTime = Number.parseInt( matches[2], 16);
+    this.readings.strokeAvgPull = Number.parseInt( matches[1], 16);
+    this.readings.strokesPerMinute = ((this.readings.strokeAvgTime - this.readings.strokeAvgPull) * 1.25);
 
     this.delayedWrite('IRT1E1\r\n');
     return this.stateAwaitingWorkoutTime;
