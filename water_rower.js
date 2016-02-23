@@ -232,7 +232,7 @@ WaterRower.prototype.stateAwaitingHeartrate = function ( msg ) {
 }
 
 WaterRower.prototype.stateAwaitingStrokeInfo = function ( msg ) {
-  debug('in state awaiting heart rate');
+  debug('in state awaiting stroke info');
 
   //var matches = msg.match(msgStrokeInfo);
   var matches = msg.match(msgStrokeRate);
