@@ -24,7 +24,7 @@ function WaterRower( opts ) {
     heartRate: 0,         // bpm
     displayTimeSeconds: 0,
     displayTimeMinutes: 0,
-    displayTimeHours: 0,
+    displayTimeHours: 0
   };
 
   debug("Creating new water rower");
@@ -248,9 +248,9 @@ WaterRower.prototype.stateAwaitingWorkoutTime = function ( msg ) {
 
   var matches = msg.match(msgWorkoutTime);
   if (matches){
-    this.readings.displayTimeSecs =     Number.parseInt( matches[1], 16);
-    this.readings.displayTimeMinutes =  Number.parseInt( matches[2], 16);
-    this.readings.displayTimeHours =    Number.parseInt( matches[3], 16);
+    this.readings.displayTimeSecs =     Number.parseInt( matches[1], 10);
+    this.readings.displayTimeMinutes =  Number.parseInt( matches[2], 10);
+    this.readings.displayTimeHours =    Number.parseInt( matches[3], 10);
 
     this.delayedWrite('IRD057\r\n');
     return this.stateConnected;
