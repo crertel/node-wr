@@ -86,18 +86,23 @@
     </div>
 
     <script>
-      var ws = new WebSocket("ws://" + location.host);
-      var $resetButton = document.getElementById("reset_button");
+
+
+      var $viewport = document.getElementById('viewport');
+
+      var $resetButton = document.getElementById('reset_button');
 
       var $dispStrokesPerMinute = document.getElementById('-strokesPerMinute');
       var $dispElapsedTime = document.getElementById('-elapsedTime');
       var $dispTotalDistance = document.getElementById('-totalDistance');
 
+      /*
       $resetButton.onclick = function postReset() {
         var msg = { msg: "reset rower"};
         ws.send( JSON.stringify(msg) );
       };
 
+      var ws = new WebSocket("ws://" + location.host);
       ws.onmessage = function(rawMsg) {
         var msg = JSON.parse(rawMsg.data);
 
@@ -111,6 +116,68 @@
 
         }
       }
+      */
+      var ctx = $viewport.getContext('2d');
+
+      function renderViewport( distance, timeLeft ){
+
+        var progress = distance/kMaxDistance;
+        ctx.canvas.height = $viewport.height;
+        ctx.canvas.width = $viewport.width;
+
+        ctx.beginPath();
+        ctx.arc(  ctx.canvas.width/2,
+                      ctx.canvas.height/2,
+                      ctx.canvas.width/4,
+                      0,
+                      progress * 2 * Math.PI,
+                    false);
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 10;
+        ctx.stroke();
+
+        ctx.fillStyle = "#ff0000";
+        ctx.font = "48px serif";
+        ctx.textAlign = 'center';
+        ctx.fillText( timeLeft,
+                      ctx.canvas.width/2,
+                      ctx.canvas.height/2,
+                      ctx.canvas.width/4);
+      }
+
+      var readings = {
+        displayTimeSeconds: 1,
+        displayTimeMinutes: 2,
+        displayTimeHours: 3
+      };
+
+      var kMaxDistance = 2000;
+      var distance = 0;
+      var speed = 100; // speed in m/s
+
+      var lastTime = new Date();
+
+      function update() {
+        var currTime = new Date();
+        distance += speed * ( (currTime - lastTime) / 1000 );
+        lastTime = currTime;
+
+        renderViewport(distance,
+                      (
+                        (readings.displayTimeHours > 9) ? readings.displayTimeHours : ("0"+readings.displayTimeHours)
+                      )
+                      + ":"
+                      + (
+                        (readings.displayTimeMinutes > 9) ? readings.displayTimeMinutes : ("0"+readings.displayTimeMinutes)
+                      )
+                      + ":"
+                      + ((readings.displayTimeSeconds > 9) ? readings.displayTimeSeconds : ("0"+readings.displayTimeSeconds) )
+                      );
+        window.requestAnimationFrame( update );
+      }
+
+      window.requestAnimationFrame( update );
+
 
       /*
       Readings may be:
