@@ -4,30 +4,89 @@
     <title>Water Rower</title>
     <meta charset="utf-8" />
     <script src="js/channel.js"></script>
+
+    <style>
+      #viewport {
+        background-color: #222;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        padding:0px;
+        margin:0px;
+      }
+
+      #strokesPerMinute {
+        position: absolute;
+        left: 50%;
+        bottom: 0px;
+        background-color: blue;
+        z-index: 55;
+      }
+
+      #elapsedTime {
+        position: absolute;
+        left: 0px;
+        bottom: 0px;
+        background-color: green;
+        z-index: 55;
+      }
+
+      #totalDistance {
+        position: absolute;
+        right: 0px;
+        bottom: 0px;
+        background-color: yellow;
+        z-index: 55;
+      }
+
+      #reset_button {
+        position: absolute;
+        right: 50%;
+        top: 0px;
+        z-index: 55;
+      }
+
+      .hud-number{
+        font-size: 2em;
+      }
+
+      .hud-label{
+        text-align: center;
+        width: 200px;
+        border: solid 10px rgba(0, 0, 0, 0.5);
+      }
+
+      body, html {
+        height: 100%;
+        width:100%;
+        padding:0px;
+        margin:0px;
+      }
+    </style>
   </head>
   <body>
-    <h1> Water Rower </h1>
-    <button id="reset_button"> Reset </button>
     <div>
-      <span id="keypad"> </span>
+      <button id="reset_button"> Reset </button>
 
-      <p id="strokesPerMinute">
-        <span id="-strokesPerMinute"></span> <br>
+      <p id="strokesPerMinute" class="hud-label">
+        <span id="-strokesPerMinute" class="hud-number">???</span> <br>
         Strokes per minute
       </p>
-      <p id="elapsedTime">
-        <span id="-elapsedTime"></span> <br>
+      <p id="elapsedTime" class="hud-label">
+        <span id="-elapsedTime" class="hud-number">???</span> <br>
         Elapsed time
       </p>
-      <p id="totalDistance">
-        <span id="-totalDistance"></span> <br>
+      <p id="totalDistance" class="hud-label">
+        <span id="-totalDistance" class="hud-number">???</span> <br>
         Total distance
       </p>
+      <canvas id="viewport" width="600" height="400">
+      </canvas>
     </div>
 
     <script>
       var ws = new WebSocket("ws://" + location.host);
-      var $keypad = document.getElementById("keypad");
       var $resetButton = document.getElementById("reset_button");
 
       var $dispStrokesPerMinute = document.getElementById('-strokesPerMinute');
@@ -50,8 +109,6 @@
           $dispTotalDistance.innerHTML = msg.data.distance;
           $dispStrokesPerMinute.innerHTML = msg.data.strokesPerMinute;
 
-        } else if (msg.type ==='keypad') {
-          $keypad.innerHTML = 'Button: ' + msg.data;
         }
       }
 
