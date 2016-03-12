@@ -18,12 +18,13 @@
 
       #strokesPerMinute {
         position: absolute;
-        left: 50%;
+        left: 0px;
         bottom: 0px;
-        background-color: blue;
+        background-color: #225;
         z-index: 55;
       }
 
+/*
       #elapsedTime {
         position: absolute;
         left: 0px;
@@ -31,12 +32,13 @@
         background-color: green;
         z-index: 55;
       }
+      */
 
       #totalDistance {
         position: absolute;
         right: 0px;
         bottom: 0px;
-        background-color: yellow;
+        background-color: #522;
         z-index: 55;
       }
 
@@ -48,12 +50,14 @@
       }
 
       .hud-number{
-        font-size: 2em;
+        font-size: 4rem;
       }
 
       .hud-label{
         text-align: center;
-        width: 200px;
+        width: 300px;
+        font-size: 2rem;
+        color: #ccc;
         border: solid 10px rgba(0, 0, 0, 0.5);
       }
 
@@ -71,15 +75,18 @@
 
       <p id="strokesPerMinute" class="hud-label">
         <span id="-strokesPerMinute" class="hud-number">???</span> <br>
-        Strokes per minute
+        <strong>Strokes per minute</strong>
       </p>
+
+      <!--
       <p id="elapsedTime" class="hud-label">
         <span id="-elapsedTime" class="hud-number">???</span> <br>
         Elapsed time
       </p>
+    -->
       <p id="totalDistance" class="hud-label">
         <span id="-totalDistance" class="hud-number">???</span> <br>
-        Total distance
+        <strong>Total distance</strong>
       </p>
       <canvas id="viewport" width="600" height="400">
       </canvas>
@@ -108,22 +115,12 @@
 
         if (msg.type === 'readings') {
           readings = msg.data;
-          /*
-          $dispElapsedTime.innerHTML = (msg.data.displayTimeHours > 9) ? msg.data.displayTimeHours : ("0"+msg.data.displayTimeHours) + ":"
-                                       + (msg.data.displayTimeMinutes > 9) ? msg.data.displayTimeMinutes : ("0"+msg.data.displayTimeMinutes) + ":"
-                                       + (msg.data.displayTimeSeconds > 9) ? msg.data.displayTimeSeconds : ("0"+msg.data.displayTimeSeconds);
-
-          $dispTotalDistance.innerHTML = msg.data.distance;
-          $dispStrokesPerMinute.innerHTML = msg.data.strokesPerMinute;
-          */
-
         }
       }
 
       var ctx = $viewport.getContext('2d');
 
       function renderViewport( distance, timeLeft ){
-
         var progress = distance/kMaxDistance;
         ctx.canvas.height = $viewport.height;
         ctx.canvas.width = $viewport.width;
@@ -168,8 +165,10 @@
 
       function update() {
         var currTime = new Date();
-        distance += speed * ( (currTime - lastTime) / 1000 );
         lastTime = currTime;
+
+        $dispTotalDistance.innerHTML = readings.distance;
+        $dispStrokesPerMinute.innerHTML = readings.strokesPerMinute;
 
         renderViewport( readings.distance,
                       (
